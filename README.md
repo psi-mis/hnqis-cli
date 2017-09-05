@@ -35,9 +35,10 @@ python setup.py install
 
 #### Contribute
 
+- Fork repo
 - Install Dev requirements via `pip install -r requirements-dev.txt`
 - Write a script in `hnqis-cli/scripts` folder, add it to `setup.py`'s `entry_points`
 - Write a test in `tests`, run all tests with `python setup.py test`
 - Open a Pull Request
-- After merging, we do `python setup.py publish`
+- After merging, we do `python setup.py publish` (increase `src/__version__.py` first)
 
