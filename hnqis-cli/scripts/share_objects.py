@@ -27,11 +27,9 @@ SOFTWARE.
 from __future__ import print_function
 
 import argparse
-import sys
 
 from six import iteritems
-from src.core.dhis import Dhis
-from src.core.logger import *
+from ..__init__ import *
 
 """
 share-objects
@@ -218,7 +216,6 @@ def main():
                 log_info(u"({}/{}) [OK] {}".format(counter, no_of_obj, obj['id']))
 
         counter += 1
-
 
 if __name__ == "__main__":
     main()
