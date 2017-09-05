@@ -85,7 +85,7 @@ class TestCommand(Command):
 
     def run(self):
         self.status('Testing with pytest...')
-        os.system('python -m pytest tests -s')
+        os.system('python -m pytest tests -sv')
 
 # Where the magic happens:
 setup(
@@ -101,7 +101,7 @@ setup(
     # py_modules=['mypackage'],
     entry_points={
         'console_scripts': [
-            'hnqis-orgunit-productivity=src.orgunit_productivity_setter:main',
+            'hnqis-attribute-setting=src.attribute_setting:main',
             'hnqis-program-orgunit=src.program_orgunit_assigner:main'
         ],
     },
