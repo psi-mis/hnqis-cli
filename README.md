@@ -1,11 +1,10 @@
 # hnqis-cli [![Version](https://img.shields.io/pypi/v/hnqis-cli.svg)](https://pypi.python.org/pypi/hnqis-cli)
 
-> Command-line scripts for HNQIS:
+> Command-line scripts for **HNQIS**
 
 * Program to Organisation Unit Assigner via CSV: `hnqis-program-orgunit --help`
 * Attribute setting via CSV: `hnqis-attribute-setting --help`
-* User messaging via CSV: `hnqis-user-message --help`
-* Indicators update (integrated indicators for each health area) `hnqis-indicator-update --help`
+* (TODO) Indicators update (integrated indicators for each health area) `hnqis-indicator-update --help`
 
 ### Installation / updating
 
