@@ -4,11 +4,7 @@ from collections import Counter
 
 import unicodecsv as csv
 
-from __init__ import init_logger, log_info, log_start_info, Dhis, valid_uid
-
-
-class CsvException(Exception):
-    pass
+from __init__ import init_logger, log_start_info, Dhis, valid_uid, CsvException
 
 
 def parse_args():
@@ -109,7 +105,7 @@ def main():
         program = api.get('programs/{}'.format(program_uid), params=params_get)
         updated = set_program_orgunits(program, orgunit_list)
         metadata_payload.append(updated)
-        print("Assigning \033[1m{}\033[0m OrgUnits to Program \033[1m{}\033[0m...".format(len(orgunit_list), program['name']))
+        print("[{}] - Assigning \033[1m{}\033[0m OrgUnits to Program \033[1m{}\033[0m...".format(args.server, len(orgunit_list), program['name']))
 
     final['programs'] = metadata_payload
     params_post = {

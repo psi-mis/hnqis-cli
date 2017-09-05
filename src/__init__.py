@@ -40,6 +40,10 @@ import requests
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
+class CsvException(Exception):
+    pass
+
+
 def get_pkg_version():
     __version__ = ''
     with open(os.path.join(ROOT_DIR, '__version__.py')) as f:
@@ -174,16 +178,16 @@ class Dhis(Config):
         except requests.RequestException as e:
             self.abort(e)
 
-        log_debug(u"URL: {}".format(r.url))
-
-        if r.status_code == 200:
-            log_debug(u"RESPONSE: {}".format(r.text))
-            if file_type == 'json':
-                return r.json()
-            else:
-                return r.text
         else:
-            self.abort(r)
+            log_debug(u"URL: {}".format(r.url))
+            if r.status_code == 200:
+                log_debug(u"RESPONSE: {}".format(r.text))
+                if file_type == 'json':
+                    return r.json()
+                else:
+                    return r.text
+            else:
+                self.abort(r)
 
     def post(self, endpoint, params, payload):
         url = '{}/{}'.format(self.api_url, endpoint)
@@ -192,12 +196,10 @@ class Dhis(Config):
         try:
             r = requests.post(url, params=params, json=payload, auth=self.auth)
         except requests.RequestException as e:
-            self.abort(r)
-
-        log_debug(r.url)
-
-        if r.status_code != 200:
-            self.abort(r)
+            self.abort(e)
+        else:
+            if r.status_code != 200:
+                self.abort(r)
 
     def put(self, endpoint, params, payload):
         url = '{}/{}'.format(self.api_url, endpoint)
@@ -206,26 +208,10 @@ class Dhis(Config):
         try:
             r = requests.put(url, params=params, json=payload, auth=self.auth)
         except requests.RequestException as e:
-            self.abort(r)
-
-        log_debug(r.url)
-
-        if r.status_code != 200:
-            self.abort(r)
-
-    def validate(self, obj_type, payload):
-        url = '{}/schemas/{}'.format(self.api_url, obj_type)
-        log_debug(u"VALIDATE: {} \n payload: {}".format(url, json.dumps(payload)))
-
-        try:
-            r = requests.post(url, json=payload, auth=self.auth)
-        except requests.RequestException as e:
-            self.abort(r)
-
-        log_debug(r.url)
-
-        if r.status_code != 200:
-            self.abort(r)
+            self.abort(e)
+        else:
+            if r.status_code != 200:
+                self.abort(r)
 
     def get_dhis_version(self):
         """ return DHIS2 verson (e.g. 26) as integer"""
@@ -241,6 +227,6 @@ class Dhis(Config):
 
     @staticmethod
     def abort(e):
-        msg = u"++++++ ERROR ++++++\n{}".format(e)
-        log_info(msg)
+        msg = u"++++++ ERROR ++++++\nHTTP code: {}\nURL: {}\nRESPONSE:\n{}"
+        log_info(msg.format(e.status_code, e.url, e.text))
         sys.exit()

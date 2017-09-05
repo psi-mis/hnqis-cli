@@ -3,7 +3,7 @@
 > Command-line scripts for HNQIS:
 
 * Program to Organisation Unit Assigner via CSV: `hnqis-program-orgunit --help`
-* Organisation Unit Productivity value setting via CSV: `hnqis-orgunit-productivity --help`
+* Attribute setting via CSV: `hnqis-attribute-setting --help`
 * User messaging via CSV: `hnqis-user-message --help`
 * Indicators update (integrated indicators for each health area) `hnqis-indicator-update --help`
 
@@ -38,7 +38,7 @@ python setup.py install
 
 - Install Dev requirements via `pip install -r requirements-dev.txt`
 - Write a script in `hnqis-cli/scripts` folder, add it to `setup.py`'s `entry_points`
-- Write a test in `tests`
+- Write a test in `tests`, run all tests with `python setup.py test`
 - Open a Pull Request
 - After merging, we do `python setup.py publish`
 

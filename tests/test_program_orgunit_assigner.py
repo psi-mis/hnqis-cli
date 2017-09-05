@@ -5,7 +5,7 @@ from src.program_orgunit_assigner import *
 
 
 def load_csv(file_name):
-    with open(os.path.join('tests', 'csv', file_name), 'r') as f:
+    with open(os.path.join('tests', 'csv', 'program_orgunits', file_name), 'r') as f:
         reader = csv.DictReader(f)
         return [row for row in reader]
 
