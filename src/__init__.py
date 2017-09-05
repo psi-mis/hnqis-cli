@@ -31,10 +31,9 @@ import json
 import logging
 import logging.handlers
 import os
-import sys
 import re
+import sys
 from datetime import datetime
-from copy import deepcopy
 
 import requests
 
@@ -43,15 +42,20 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 def get_pkg_version():
     __version__ = ''
-    with open(os.path.join(ROOT_DIR, 'version.py')) as f:
+    with open(os.path.join(ROOT_DIR, '__version__.py')) as f:
         exec (f.read())
     return __version__
+
+
+def valid_uid(uid):
+    """Check if string matches DHIS2 UID pattern"""
+    return re.compile("[A-Za-z][A-Za-z0-9]{10}").match(uid)
 
 
 def init_logger(debug_flag):
     logformat = '%(levelname)s:%(asctime)s %(message)s'
     datefmt = '%Y-%m-%d-%H:%M:%S'
-    filename = 'dhis2-pk.log'
+    filename = 'hnqis-cli.log'
     debug_flag = debug_flag
 
     # only log 'requests' library's warning messages (including errors)
@@ -92,7 +96,7 @@ class ConfigException(Exception):
 
 
 class Config(object):
-    def __init__(self, server, username, password, api_version):
+    def __init__(self, server, username, password):
 
         if not server:
             dish = self.get_dish()
@@ -110,10 +114,8 @@ class Config(object):
         elif not server.startswith('https://'):
             server = 'https://{}'.format(server)
         self.auth = (username, password)
-        if api_version:
-            self.api_url = '{}/api/{}'.format(server, api_version)
-        else:
-            self.api_url = '{}/api'.format(server)
+
+        self.api_url = '{}/api'.format(server)
         now = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
         self.file_timestamp = '{}_{}'.format(now, server.replace('https://', '').replace('.', '-').replace('/', '-'))
 
@@ -159,8 +161,8 @@ class Dhis(Config):
         'readwrite': 'rw------'
     }
 
-    def __init__(self, server, username, password, api_version):
-        Config.__init__(self, server, username, password, api_version)
+    def __init__(self, server, username, password):
+        Config.__init__(self, server, username, password)
 
     def get(self, endpoint, file_type='json', params=None):
         url = '{}/{}.{}'.format(self.api_url, endpoint, file_type)
@@ -169,8 +171,8 @@ class Dhis(Config):
 
         try:
             r = requests.get(url, params=params, auth=self.auth)
-        except requests.RequestException:
-            self.abort(r)
+        except requests.RequestException as e:
+            self.abort(e)
 
         log_debug(u"URL: {}".format(r.url))
 
@@ -211,16 +213,6 @@ class Dhis(Config):
         if r.status_code != 200:
             self.abort(r)
 
-    def post_file(self, endpoint, filename, content_type):
-        url = '{}/{}'.format(self.api_url, endpoint)
-        headers = {"Content-Type": content_type}
-        fileread = open(filename, 'rb').read()
-        r = requests.post(url, data=fileread, headers=headers, auth=self.auth)
-        if r.status_code not in range(200, 204):
-            self.abort(r)
-        else:
-            return r.text
-
     def validate(self, obj_type, payload):
         url = '{}/schemas/{}'.format(self.api_url, obj_type)
         log_debug(u"VALIDATE: {} \n payload: {}".format(url, json.dumps(payload)))
@@ -248,93 +240,7 @@ class Dhis(Config):
         return int(version.split('.')[1])
 
     @staticmethod
-    def abort(r):
-        msg = u"++++++ ERROR ++++++\nHTTP code: {}\nURL: {}\nRESPONSE:\n{}"
-        log_info(msg.format(r.status_code, r.url, r.text))
+    def abort(e):
+        msg = u"++++++ ERROR ++++++\n{}".format(e)
+        log_info(msg)
         sys.exit()
-
-    @staticmethod
-    def get_shareable_object_type(passed_name):
-        obj_types = shareable_object_types()
-        valid_obj_name1 = obj_types.get(passed_name.lower(), None)
-        if valid_obj_name1 is None:
-            valid_obj_name2 = obj_types.get(passed_name[:-1].lower(), None)
-            if valid_obj_name2 is None:
-                log_info(u"+++ Could not find a shareable object type for -t='{}'".format(passed_name))
-                sys.exit()
-            else:
-                return valid_obj_name2
-        return valid_obj_name1
-
-    @staticmethod
-    def get_all_object_type(passed_name):
-        obj_types = all_object_types()
-        valid_obj_name1 = obj_types.get(passed_name.lower(), None)
-        if valid_obj_name1 is None:
-            valid_obj_name2 = obj_types.get(passed_name[:-1].lower(), None)
-            if valid_obj_name2 is None:
-                log_info(u"+++ Could not find a valid object type for -t='{}'".format(passed_name))
-                sys.exit()
-            else:
-                return valid_obj_name2
-        return valid_obj_name1
-
-
-shareable = {
-    'userGroups': ['usergroups', 'ug', 'usergroup'],
-    'sqlViews': ['sqlviews', 'sqlview'],
-    'constants': ['constants', 'constant'],
-    'optionSets': ['optionsets', 'optionset', 'os'],
-    'optionGroups': ['optiongroups', 'optiongroup'],
-    'optionGroupSets': ['optiongroupsets', 'optiongroupset'],
-    'legendSets': ['legendsets', 'legendset'],
-    'organisationUnitGroups': ['organisationunitgroups', 'oug', 'orgunitgroups', 'ougroups', 'orgunitgroup', 'ougroup'],
-    'organisationUnitGroupSets': ['organisationunitgroupsets', 'ougs', 'orgunitgroupsets', 'ougroupsets',
-                                  'orgunitgroupset', 'ougroupset'],
-    'categoryOptions': ['categoryoptions', 'catoptions', 'catoption', 'categoryoption', 'dataelementcategoryoption'],
-    'categoryOptionGroups': ['categoryoptiongroups', 'catoptiongroups', 'catoptiongroup', 'categoryoptiongroup'],
-    'categoryOptionGroupSets': ['categoryoptiongroupsets', 'catoptiongroupsets', 'catoptiongroupset',
-                                'categoryoptiongroupset'],
-    'categories': ['categories', 'cat', 'cats' 'category', 'dataelementcategory', 'dataelementcategories'],
-    'categoryCombos': ['categorycombos', 'catcombos', 'catcombo', 'categorycombo', 'categorycombination',
-                       'categorycombinations'],
-    'dataElements': ['dataelements', 'de', 'des', 'dataelement'],
-    'dataElementGroups': ['dataelementgroups', 'deg', 'degroups', 'degroup', 'dataelementgroup'],
-    'dataElementGroupSets': ['dataelementgroupsets', 'degs', 'degroupsets', 'degroupset', 'dataelementgroupset'],
-    'indicators': ['indicators', 'i', 'ind', 'indicator'],
-    'indicatorGroups': ['indicatorgroups', 'ig', 'indgroups', 'indicatorgroup'],
-    'indicatorGroupSets': ['indicatorgroupsets', 'igs', 'indgroupsets', 'indicatorgroupset'],
-    'dataSets': ['datasets', 'ds', 'dataset'],
-    'dataApprovalLevels': ['dataapprovallevels', 'datasetapprovallevel'],
-    'validationRuleGroups': ['validationrulegroups', 'validationrulegroup'],
-    'interpretations': ['interpretations', 'interpretation'],
-    'trackedEntityAttributes': ['trackedentityattributes', 'trackedentityattribute', 'tea', 'teas'],
-    'programs': ['programs', 'program'],
-    'eventCharts': ['eventcharts', 'eventchart'],
-    'eventReports': ['eventreports', 'eventtables', 'eventreport'],
-    'programIndicators': ['programindicators', 'pi', 'programindicator'],
-    'maps': ['maps', 'map'],
-    'documents': ['documents', 'document'],
-    'reports': ['reports', 'report'],
-    'charts': ['charts', 'chart', 'datavisualization', 'datavisualizations', 'datavizualisation', 'datavizualisations'],
-    'reportTables': ['pivottable', 'pivottables', 'reporttables', 'reporttable'],
-    'dashboards': ['dashboards', 'dashboard']
-}
-
-
-def shareable_object_types():
-    """Reverse dictionary from  key:list  to  each_listitem: key and sort it"""
-    return dict((v, k) for k in shareable for v in shareable[k])
-
-
-def all_object_types():
-    """Reverse dictionary from  key:list  to  each_listitem: key and sort it"""
-    all_objects = deepcopy(shareable)
-    all_objects['organisationUnits'] = ['ou', 'orgunit', 'orgunits']
-    all_objects['validationRules'] = ['validationrules', 'validationrule']
-    return dict((v, k) for k in all_objects for v in all_objects[k])
-
-
-def valid_uid(uid):
-    """Check if string matches DHIS2 UID pattern"""
-    return re.compile("[A-Za-z][A-Za-z0-9]{10}").match(uid)

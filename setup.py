@@ -31,7 +31,7 @@ with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
 
 # Load the package's __version__.py module as a dictionary.
 about = {}
-with open(os.path.join(here, NAME, '__version__.py')) as f:
+with open(os.path.join(here, 'src', '__version__.py')) as f:
     exec (f.read(), about)
 
 
@@ -68,6 +68,25 @@ class PublishCommand(Command):
         sys.exit()
 
 
+class TestCommand(Command):
+    description = 'Run Unit tests.'
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        self.status('Testing with pytest...')
+        os.system('python -m pytest tests -s')
+
 # Where the magic happens:
 setup(
     name=NAME,
@@ -81,7 +100,10 @@ setup(
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
     entry_points={
-        'console_scripts': ['hnqis-orgunit-productivity={}.scripts.orgunit_productivity_values:main'.format(NAME)],
+        'console_scripts': [
+            'hnqis-orgunit-productivity=src.orgunit_productivity_setter:main',
+            'hnqis-program-orgunit=src.program_orgunit_assigner:main'
+        ],
     },
     install_requires=REQUIRED,
     include_package_data=True,
@@ -94,12 +116,11 @@ setup(
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: GNU Affero General Public License v3',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.5',
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 2.7'
     ],
     # $ setup.py publish support.
     cmdclass={
         'publish': PublishCommand,
+        'test': TestCommand
     },
 )
