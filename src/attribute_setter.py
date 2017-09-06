@@ -97,7 +97,7 @@ def main():
     if attr['{}Attribute'.format(args.object_type[:-1])] is False:
         log_info("Attribute {} is not assigned to type {}".format(args.attribute_uid, args.object_type[:-1]))
 
-    print("[{}] - Updating Attribute Values for Attribute \033[1m{}\033[0m for \033[1m{}\033[0m \033[1m{}\033[0m...".format(args.server, args.attribute_uid, len(data), args.object_type))
+    print(u"[{}] - Updating Attribute Values for Attribute \033[1m{}\033[0m for \033[1m{}\033[0m \033[1m{}\033[0m...".format(args.server, args.attribute_uid, len(data), args.object_type))
     try:
         time.sleep(3)
     except KeyboardInterrupt:
@@ -111,7 +111,7 @@ def main():
         obj_old = api.get('{}/{}'.format(args.object_type, obj_uid), params=params_get)
         obj_updated = create_or_update_attributevalues(obj=obj_old, attribute_uid=args.attribute_uid, attribute_value=attribute_value)
         api.put('{}/{}'.format(args.object_type, obj_uid), params=None, payload=obj_updated)
-        print("{}/{} - Updated AttributeValue: {} - \033[1m{}:\033[0m {}".format(i, len(data), attribute_value, args.object_type[:-1], obj_uid))
+        print(u"{}/{} - Updated AttributeValue: {} - \033[1m{}:\033[0m {}".format(i, len(data), attribute_value, args.object_type[:-1], obj_uid))
 
 
 if __name__ == "__main__":

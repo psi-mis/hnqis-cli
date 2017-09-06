@@ -58,7 +58,7 @@ def dump_to_file(data):
     filename = "healtharea_indicators_backup_{}.json".format(ts)
     with open(filename, 'w') as out:
         json.dump(data, out, indent=4)
-    print("Before state backed up to \033[1m{}\033[0m".format(filename))
+    print(u"Before state backed up to \033[1m{}\033[0m".format(filename))
 
 
 def main():
@@ -119,7 +119,7 @@ def main():
 
         if no_of_programs != len(pi_uids):
             print(
-                "\033[1mWarning\033[1m{}\033[0m -- programs: {} VS # count programIndicators {} (ids): {}".format(no_of_programs,
+                u"\033[1mWarning\033[1m{}\033[0m -- programs: {} VS # count programIndicators {} (ids): {}".format(no_of_programs,
                                                                                               len(pi_uids),
                                                                                                json.dumps(pi_uids)))
 
@@ -127,18 +127,18 @@ def main():
             i = data2['indicators'][0]
             i['numerator'] = create_numerator(pi_uids)
             container.append(i)
-            print('  \033[1m{}\033[0m - Added {} programIndicators to numerator of indicator "{}"'.format(ha, len(pi_uids), i['name']))
+            print(u'  \033[1m{}\033[0m - Added {} programIndicators to numerator of indicator "{}"'.format(ha, len(pi_uids), i['name']))
 
 
         elif len(data2['indicators']) > 1:
-            print("\033[1mMore than one indicator found for health area {}\033[0m".format(ha))
+            print(u"\033[1mMore than one indicator found for health area {}\033[0m".format(ha))
         elif len(pi_uids) != 0:
-            print("\033[1mNo indicator found for health area {}\033[0m".format(ha))
+            print(u"\033[1mNo indicator found for health area {}\033[0m".format(ha))
 
     dump_to_file(backup_indicators)
     indicators['indicators'] = container
 
-    print("Posting updated programindicators to \033[1m{}\033[0m...".format(args.server))
+    print(u"Posting updated programindicators to \033[1m{}\033[0m...".format(args.server))
     time.sleep(3)
 
     api.post('metadata', params={'importMode': 'COMMIT', 'preheatCache': False}, payload=indicators)

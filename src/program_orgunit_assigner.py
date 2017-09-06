@@ -34,23 +34,23 @@ def validate_csv(data):
         raise CsvException(" CSV not valid (empty?)")
 
     if not data[0].get('orgunit', None):
-        raise CsvException("+++ CSV not valid: CSV must have 'orgunit' header")
+        raise CsvException(u"+++ CSV not valid: CSV must have 'orgunit' header")
 
     if len(data[0]) <= 1:
-        raise CsvException("+++ No programs found in CSV")
+        raise CsvException(u"+++ No programs found in CSV")
 
     orgunit_uids = [ou['orgunit'] for ou in data]
     if len(orgunit_uids) != len(set(orgunit_uids)):
-        raise CsvException("Duplicate Orgunits (rows) found in the CSV")
+        raise CsvException(u"Duplicate Orgunits (rows) found in the CSV")
 
     for ou in orgunit_uids:
         if not valid_uid(ou):
-            raise CsvException("OrgUnit {} is not a valid UID in the CSV".format(ou))
+            raise CsvException(u"OrgUnit {} is not a valid UID in the CSV".format(ou))
 
     for row in data:
         for p in row.keys():
             if not valid_uid(p) and p != 'orgunit':
-                raise CsvException("Program {} is not a valid UID in the CSV".format(p))
+                raise CsvException(u"Program {} is not a valid UID in the CSV".format(p))
     return True
 
 
@@ -105,7 +105,7 @@ def main():
         program = api.get('programs/{}'.format(program_uid), params=params_get)
         updated = set_program_orgunits(program, orgunit_list)
         metadata_payload.append(updated)
-        print("[{}] - Assigning \033[1m{}\033[0m OrgUnits to Program \033[1m{}\033[0m...".format(args.server, len(orgunit_list), program['name']))
+        print(u"[{}] - Assigning \033[1m{}\033[0m OrgUnits to Program \033[1m{}\033[0m...".format(args.server, len(orgunit_list), program['name']))
 
     final['programs'] = metadata_payload
     params_post = {
