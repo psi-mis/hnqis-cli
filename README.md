@@ -30,7 +30,7 @@ python setup.py install
 ```
 
 #### Source code disclaimer
-- The `hnqis-cli/__init__.py` file was copied from [dhis2-pocket-knife](https://github.com/davidhuser/dhis2-pocket-knife) (MIT licence)
+- The `src/__init__.py` file was copied/modified from [dhis2-pocket-knife](https://github.com/davidhuser/dhis2-pocket-knife) (MIT licence)
 
 
 #### Contribute
@@ -40,5 +40,5 @@ python setup.py install
 - Write a script in `src` folder, add it to `setup.py`'s `entry_points`
 - Write a test in `tests`, run all tests with `python setup.py test`
 - Open a Pull Request
-- After merging, we do `python setup.py publish` (increase `src/__version__.py` first)
+- After merging, we do `python setup.py publish` (increase `src/__version__.py` first) to publish to PyPI
 

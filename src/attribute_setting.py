@@ -93,6 +93,11 @@ def main():
         data = [row for row in reader]
         validate_csv(data)
 
+    attr_get = {'fields': 'id,name,{}Attribute'.format(args.object_type[:-1])}
+    attr = api.get('attributes/{}'.format(args.attribute_uid), params=attr_get)
+    if attr['{}'.format(args.object_type[:-1])] is False:
+        log_info("Attribute {} is not assigned to type {}".format(args.attribute_uid, args.object_type[:-1]))
+
     print("[{}] - Updating Attribute Values for Attribute \033[1m{}\033[0m for \033[1m{}\033[0m \033[1m{}\033[0m...".format(args.server, args.attribute_uid, len(data), args.object_type))
     try:
         time.sleep(3)
