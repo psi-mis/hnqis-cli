@@ -1,6 +1,6 @@
 import pytest
 
-from src.attribute_setting import *
+from src.attribute_setter import *
 
 TEST_ATTRIBUTE_UID = 'M8fCOxtkURr'
 

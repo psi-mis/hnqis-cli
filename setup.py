@@ -101,7 +101,7 @@ setup(
     # py_modules=['mypackage'],
     entry_points={
         'console_scripts': [
-            'hnqis-attribute-setting=src.attribute_setting:main',
+            'hnqis-attribute-setting=src.attribute_setter:main',
             'hnqis-program-orgunit=src.program_orgunit_assigner:main'
         ],
     },
