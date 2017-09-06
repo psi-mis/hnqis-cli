@@ -1,5 +1,6 @@
 hnqis-cli.log
 .~lock.*
+backup_*.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -102,7 +102,8 @@ setup(
     entry_points={
         'console_scripts': [
             'hnqis-attribute-setting=src.attribute_setter:main',
-            'hnqis-program-orgunit=src.program_orgunit_assigner:main'
+            'hnqis-program-orgunit=src.program_orgunit_assigner:main',
+            'hnqis-indicator-update=src.indicator_healtharea_updater:main'
         ],
     },
     install_requires=REQUIRED,
