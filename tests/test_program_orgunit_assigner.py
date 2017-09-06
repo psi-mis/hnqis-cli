@@ -1,91 +1,52 @@
 import pytest
 
-import os
 from src.program_orgunit_assigner import *
 
-
-def load_csv(file_name):
-    with open(os.path.join('tests', 'csv', 'program_orgunits', file_name), 'r') as f:
-        reader = csv.DictReader(f)
-        return [row for row in reader]
+PATH = os.path.join('tests', 'csv', 'program_orgunits')
 
 
-@pytest.fixture
-def csv_file_valid():
-    return load_csv('valid.csv')
+def test_csv_valid():
+    f = load_csv(path=os.path.join(PATH, 'valid.csv'))
+    assert validate_csv(f)
 
 
-def test_csv_valid(csv_file_valid):
-    assert validate_csv(csv_file_valid)
-
-
-@pytest.fixture
-def csv_file_empty():
-    return load_csv('empty.csv')
-
-
-def test_csv_empty(csv_file_empty):
+def test_csv_empty():
     with pytest.raises(CsvException):
-        validate_csv(csv_file_empty)
+        load_csv(path=os.path.join(PATH, 'empty.csv'))
 
 
-@pytest.fixture
-def csv_file_no_programs():
-    return load_csv('no_programs.csv')
-
-
-def test_csv_no_programs(csv_file_no_programs):
+def test_csv_no_programs():
     with pytest.raises(CsvException):
-        validate_csv(csv_file_no_programs)
+        load_csv(path=os.path.join(PATH, 'no_programs.csv'))
 
 
-@pytest.fixture
-def csv_file_ogrunit():
-    return load_csv('ogrunit.csv')
-
-
-def test_csv_ogrunit(csv_file_ogrunit):
+def test_csv_ogrunit():
+    f = load_csv(path=os.path.join(PATH, 'ogrunit.csv'))
     with pytest.raises(CsvException):
-        validate_csv(csv_file_ogrunit)
+        validate_csv(f)
 
 
-@pytest.fixture
-def csv_file_duplicate_orgunits():
-    return load_csv('duplicate_orgunits.csv')
-
-
-def test_csv_duplicate_orgunits(csv_file_duplicate_orgunits):
+def test_csv_duplicate_orgunits():
+    f = load_csv(path=os.path.join(PATH, 'duplicate_orgunits.csv'))
     with pytest.raises(CsvException):
-        validate_csv(csv_file_duplicate_orgunits)
+        validate_csv(f)
 
 
-@pytest.fixture
-def csv_file_no_valid_orgunits():
-    return load_csv('no_valid_orgunits.csv')
-
-
-def test_csv_no_valid_orgunits(csv_file_no_valid_orgunits):
+def test_csv_no_valid_orgunits():
+    f = load_csv(path=os.path.join(PATH, 'no_valid_orgunits.csv'))
     with pytest.raises(CsvException):
-        validate_csv(csv_file_no_valid_orgunits)
+        validate_csv(f)
 
 
-@pytest.fixture
-def csv_file_no_valid_programs():
-    return load_csv('no_valid_programs.csv')
-
-
-def test_csv_no_valid_programs(csv_file_no_valid_programs):
+def test_csv_no_valid_programs():
+    f = load_csv(path=os.path.join(PATH, 'no_valid_programs.csv'))
     with pytest.raises(CsvException):
-        validate_csv(csv_file_no_valid_programs)
+        validate_csv(f)
 
 
-@pytest.fixture
-def csv_full():
-    return load_csv('full.csv')
-
-
-def test_program_orgunit_map(csv_full):
-    mapped = get_program_orgunit_map(csv_full)
+def test_program_orgunit_map():
+    f = load_csv(path=os.path.join(PATH, 'full.csv'))
+    mapped = get_program_orgunit_map(f)
     assert set(mapped['lxAQ7Zs9VYR']) == {'HlDMbDWUmTy', 'Rp268JB6Ne4', 'cDw53Ej8rju'}
     assert set(mapped['IpHINAT79UW']) == {'cDw53Ej8rju'}
     assert set(mapped['kla3mAPgvCH']) == {'HlDMbDWUmTy', 'cDw53Ej8rju'}
@@ -166,3 +127,9 @@ def test_set_program_orgunits(program_orgunit_map, program_metadata):
     assert expected1 in updated_metadata['organisationUnits']
     assert expected2 in updated_metadata['organisationUnits']
     assert len(updated_metadata['organisationUnits']) == 2
+
+    # assert other values have not changed
+    updated_metadata.pop('organisationUnits')
+    program_metadata.pop('organisationUnits')
+    pairs = zip(updated_metadata, program_metadata)
+    assert any(x != y for x, y in pairs)

@@ -35,6 +35,8 @@ import re
 import sys
 from datetime import datetime
 
+import unicodecsv as csv
+
 import requests
 
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -42,6 +44,18 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class CsvException(Exception):
     pass
+
+
+def load_csv(path):
+    try:
+        with open(path, 'rb') as csvfile:
+            # infer delimiter / dialect
+            dialect = csv.Sniffer().sniff(csvfile.read(), delimiters=';,')
+            csvfile.seek(0)
+            reader = csv.DictReader(csvfile, dialect=dialect)
+            return [row for row in reader]
+    except csv.Error as e:
+        raise CsvException(e)
 
 
 def get_pkg_version():

@@ -2,12 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-import sys
-from collections import Counter
 
-import unicodecsv as csv
+from copy import deepcopy
 
-from __init__ import init_logger, log_start_info, Dhis, valid_uid, CsvException
+from __init__ import *
 
 
 def parse_args():
@@ -71,11 +69,12 @@ def get_program_orgunit_map(data):
 
 
 def set_program_orgunits(program, orgunit_list):
+    program_copy = deepcopy(program)
     tmp = []
     for ou in orgunit_list:
         tmp.append({"id": ou})
-    program['organisationUnits'] = tmp
-    return program
+    program_copy['organisationUnits'] = tmp
+    return program_copy
 
 
 def main():
@@ -91,10 +90,8 @@ def main():
         sys.exit()
     """
 
-    with open(args.source_csv) as f:
-        reader = csv.DictReader(f)
-        data = [row for row in reader]
-        validate_csv(data)
+    data = load_csv(args.source_csv)
+    validate_csv(data)
 
     program_uids = [h.strip() for h in data[0] if h != 'orgunit']
     for p in program_uids:

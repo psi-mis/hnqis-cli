@@ -5,39 +5,29 @@ from src.attribute_setter import *
 TEST_ATTRIBUTE_UID = 'M8fCOxtkURr'
 
 
-def load_csv(file_name):
-    with open(os.path.join('tests', 'csv', 'attribute_setting', file_name), 'r') as f:
-        reader = csv.DictReader(f)
-        return [row for row in reader]
+PATH = os.path.join('tests', 'csv', 'attribute_setter')
 
 
-@pytest.fixture
-def csv_file_valid():
-    return load_csv('valid.csv')
+def test_csv_file_valid():
+    f = load_csv(path=os.path.join(PATH, 'valid.csv'))
+    assert validate_csv(f)
 
 
-def test_csv_file_valid(csv_file_valid):
-    assert validate_csv(csv_file_valid)
-
-
-@pytest.fixture
-def csv_file_duplicates():
-    return load_csv('duplicates.csv')
-
-
-def test_csv_duplicate_objects(csv_file_duplicates):
+def test_csv_duplicate_objects():
+    f = load_csv(path=os.path.join(PATH, 'duplicates.csv'))
     with pytest.raises(CsvException):
-        validate_csv(csv_file_duplicates)
+        validate_csv(f)
 
 
-@pytest.fixture
-def csv_file_no_valid_uid():
-    return load_csv('no_valid_uid.csv')
-
-
-def test_csv_no_valid_uid(csv_file_no_valid_uid):
+def test_csv_no_valid_uid():
+    f = load_csv(path=os.path.join(PATH, 'no_valid_uid.csv'))
     with pytest.raises(CsvException):
-        validate_csv(csv_file_no_valid_uid)
+        validate_csv(f)
+
+
+def test_csv_semicolon():
+    f = load_csv(path=os.path.join(PATH, 'semicolon.csv'))
+    assert validate_csv(f)
 
 
 @pytest.fixture
