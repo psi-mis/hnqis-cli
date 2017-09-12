@@ -120,13 +120,30 @@ def program_metadata():
     return p
 
 
-def test_set_program_orgunits(program_orgunit_map, program_metadata):
-    updated_metadata = set_program_orgunits(program_metadata, program_orgunit_map['VBqh0ynB2wv'])
+def test_set_program_orgunits_replace(program_orgunit_map, program_metadata):
+    updated_metadata = set_program_orgunits(program_metadata, program_orgunit_map['VBqh0ynB2wv'], False)
     expected1 = {'id': 'HlDMbDWUmTy'}
     expected2 = {'id': 'cDw53Ej8rju'}
     assert expected1 in updated_metadata['organisationUnits']
     assert expected2 in updated_metadata['organisationUnits']
     assert len(updated_metadata['organisationUnits']) == 2
+
+    # assert other values have not changed
+    updated_metadata.pop('organisationUnits')
+    program_metadata.pop('organisationUnits')
+    pairs = zip(updated_metadata, program_metadata)
+    assert any(x != y for x, y in pairs)
+
+
+def test_set_program_orgunits_append(program_orgunit_map, program_metadata):
+    updated_metadata = set_program_orgunits(program_metadata, program_orgunit_map['VBqh0ynB2wv'], True)
+    expected1 = {'id': 'HlDMbDWUmTy'}
+    expected2 = {'id': 'cDw53Ej8rju'}
+    expected3 = {'id': 'bVZTNrnfn9G'}
+    assert expected1 in updated_metadata['organisationUnits']
+    assert expected2 in updated_metadata['organisationUnits']
+    assert expected3 in updated_metadata['organisationUnits']
+    assert len(updated_metadata['organisationUnits']) == 3
 
     # assert other values have not changed
     updated_metadata.pop('organisationUnits')

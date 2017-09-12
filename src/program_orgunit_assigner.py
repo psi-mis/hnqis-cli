@@ -9,18 +9,19 @@ from __init__ import *
 
 
 def parse_args():
-    usage = "hnqis-program-orgunit [-s] [-u] [-p] -c" \
+    usage = "hnqis-program-orgunit [-s] [-u] [-p] -c [-a]" \
             "\n\n\033[1mExample:\033[0m " \
-            "\nhnqis-program-orgunit -s=data.psi-mis.org -u=admin -p=district -c=/path/to/file.csv" \
+            "\nhnqis-program-orgunit -s=data.psi-mis.org -u=admin -p=district -c=/path/to/file.csv -a" \
             "\n\n\033[1mCSV file structure:\033[0m         " \
             "\norgunit     | <programUID1> | <programUID2> " \
             "\n------------|---------------|---------------" \
             "\n<orgunitUID>| yes           | no            " \
             "\n                                            "
     parser = argparse.ArgumentParser(
-        description="Assign OrgUnits to Programs sourced from CSV file (replaces orgunits)", usage=usage)
+        description="Assign OrgUnits to Programs sourced from CSV file", usage=usage)
     parser.add_argument('-s', dest='server', action='store', help="Server URL without /api/ e.g. -s=data.psi-mis.org")
     parser.add_argument('-c', dest='source_csv', action='store', help="CSV file path", required=True)
+    parser.add_argument('-a', dest='append_orgunit', action='store', help="Append Orgunit to existing", default=False, required=False)
     parser.add_argument('-u', dest='username', action='store', help="DHIS2 username")
     parser.add_argument('-p', dest='password', action='store', help="DHIS2 password")
     parser.add_argument('-d', dest='debug', action='store_true', default=False, required=False,
@@ -68,9 +69,14 @@ def get_program_orgunit_map(data):
     return program_orgunit_map
 
 
-def set_program_orgunits(program, orgunit_list):
+def set_program_orgunits(program, orgunit_list, append_orgunits):
     program_copy = deepcopy(program)
-    tmp = []
+    if append_orgunits:
+        tmp = program_copy.get('organisationUnits', None)
+        if tmp is None:
+            tmp = []
+    else:
+        tmp = []
     for ou in orgunit_list:
         tmp.append({"id": ou})
     program_copy['organisationUnits'] = tmp
@@ -103,7 +109,7 @@ def main():
     for program_uid, orgunit_list in program_orgunit_map.iteritems():
         params_get = {'fields': ':owner'}
         program = api.get('programs/{}'.format(program_uid), params=params_get)
-        updated = set_program_orgunits(program, orgunit_list)
+        updated = set_program_orgunits(program, orgunit_list, args.append_orgunits)
         metadata_payload.append(updated)
         print(u"[{}] - Assigning \033[1m{}\033[0m OrgUnits to Program \033[1m{}\033[0m...".format(args.server, len(orgunit_list), program['name']))
 
