@@ -21,7 +21,7 @@ def parse_args():
         description="Assign OrgUnits to Programs sourced from CSV file", usage=usage)
     parser.add_argument('-s', dest='server', action='store', help="Server URL without /api/ e.g. -s=data.psi-mis.org")
     parser.add_argument('-c', dest='source_csv', action='store', help="CSV file path", required=True)
-    parser.add_argument('-a', dest='append_orgunit', action='store_true', help="Append Orgunit to existing", default=False, required=False)
+    parser.add_argument('-a', dest='append_orgunits', action='store_true', help="Append Orgunit to existing", default=False, required=False)
     parser.add_argument('-u', dest='username', action='store', help="DHIS2 username")
     parser.add_argument('-p', dest='password', action='store', help="DHIS2 password")
     parser.add_argument('-d', dest='debug', action='store_true', default=False, required=False,
@@ -72,10 +72,12 @@ def get_program_orgunit_map(data):
 def set_program_orgunits(program, orgunit_list, append_orgunits):
     program_copy = deepcopy(program)
     if append_orgunits:
+        print(u"Appending to orgunits...")
         tmp = program_copy.get('organisationUnits', None)
         if tmp is None:
             tmp = []
     else:
+        print(u"Replacing orgunits...")
         tmp = []
     for ou in orgunit_list:
         tmp.append({"id": ou})
@@ -99,9 +101,15 @@ def main():
     data = load_csv(args.source_csv)
     validate_csv(data)
 
-    program_uids = [h.strip() for h in data[0] if h != 'orgunit']
-    for p in program_uids:
-        api.get('programs/{}'.format(p))
+    programs_csv = [h.strip() for h in data[0] if h != 'orgunit']
+    params_get = {
+        'fields': 'id',
+        'paging': False
+    }
+    programs_server = [p['id'] for p in api.get('programs', params=params_get)['programs']]
+    for p in programs_csv:
+        if p not in programs_server:
+            print(u"Program {0} is not a valid program: {1}/programs/{0}.json".format(p, api.api_url))
 
     program_orgunit_map = get_program_orgunit_map(data)
     metadata_payload = []
