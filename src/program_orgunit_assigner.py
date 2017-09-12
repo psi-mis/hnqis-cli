@@ -21,7 +21,7 @@ def parse_args():
         description="Assign OrgUnits to Programs sourced from CSV file", usage=usage)
     parser.add_argument('-s', dest='server', action='store', help="Server URL without /api/ e.g. -s=data.psi-mis.org")
     parser.add_argument('-c', dest='source_csv', action='store', help="CSV file path", required=True)
-    parser.add_argument('-a', dest='append_orgunit', action='store', help="Append Orgunit to existing", default=False, required=False)
+    parser.add_argument('-a', dest='append_orgunit', action='store_true', help="Append Orgunit to existing", default=False, required=False)
     parser.add_argument('-u', dest='username', action='store', help="DHIS2 username")
     parser.add_argument('-p', dest='password', action='store', help="DHIS2 password")
     parser.add_argument('-d', dest='debug', action='store_true', default=False, required=False,
