@@ -67,6 +67,17 @@ def program_orgunit_map():
     }
     return j
 
+@pytest.fixture
+def program_orgunit_map2():
+    j = {
+        "VBqh0ynB2wv": [
+            "HlDMbDWUmTy",
+            "cDw53Ej8rju",
+            "bVZTNrnfn9G"
+        ]
+    }
+    return j
+
 
 @pytest.fixture
 def program_metadata():
@@ -105,6 +116,9 @@ def program_metadata():
         "organisationUnits": [
             {
                 "id": "bVZTNrnfn9G"
+            },
+            {
+                "id": "Nxw94OjsCjS"
             }
         ],
         "userGroupAccesses": [],
@@ -137,6 +151,23 @@ def test_set_program_orgunits_replace(program_orgunit_map, program_metadata):
 
 def test_set_program_orgunits_append(program_orgunit_map, program_metadata):
     updated_metadata = set_program_orgunits(program_metadata, program_orgunit_map['VBqh0ynB2wv'], True)
+    expected1 = {'id': 'HlDMbDWUmTy'}
+    expected2 = {'id': 'cDw53Ej8rju'}
+    expected3 = {'id': 'bVZTNrnfn9G'}
+    assert expected1 in updated_metadata['organisationUnits']
+    assert expected2 in updated_metadata['organisationUnits']
+    assert expected3 in updated_metadata['organisationUnits']
+    assert len(updated_metadata['organisationUnits']) == 3
+
+    # assert other values have not changed
+    updated_metadata.pop('organisationUnits')
+    program_metadata.pop('organisationUnits')
+    pairs = zip(updated_metadata, program_metadata)
+    assert any(x != y for x, y in pairs)
+
+
+def test_set_program_orgunits_append_existing(program_orgunit_map2, program_metadata):
+    updated_metadata = set_program_orgunits(program_metadata, program_orgunit_map2['VBqh0ynB2wv'], True)
     expected1 = {'id': 'HlDMbDWUmTy'}
     expected2 = {'id': 'cDw53Ej8rju'}
     expected3 = {'id': 'bVZTNrnfn9G'}

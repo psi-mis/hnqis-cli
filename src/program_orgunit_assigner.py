@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import argparse
-
 from copy import deepcopy
 
 from __init__ import *
@@ -21,7 +20,8 @@ def parse_args():
         description="Assign OrgUnits to Programs sourced from CSV file", usage=usage)
     parser.add_argument('-s', dest='server', action='store', help="Server URL without /api/ e.g. -s=data.psi-mis.org")
     parser.add_argument('-c', dest='source_csv', action='store', help="CSV file path", required=True)
-    parser.add_argument('-a', dest='append_orgunits', action='store_true', help="Append Orgunit to existing", default=False, required=False)
+    parser.add_argument('-a', dest='append_orgunits', action='store_true', help="Append Orgunit to existing",
+                        default=False, required=False)
     parser.add_argument('-u', dest='username', action='store', help="DHIS2 username")
     parser.add_argument('-p', dest='password', action='store', help="DHIS2 password")
     parser.add_argument('-d', dest='debug', action='store_true', default=False, required=False,
@@ -72,12 +72,13 @@ def get_program_orgunit_map(data):
 def set_program_orgunits(program, orgunit_list, append_orgunits):
     program_copy = deepcopy(program)
     if append_orgunits:
-        print(u"Appending to orgunits...")
         tmp = program_copy.get('organisationUnits', None)
         if tmp is None:
             tmp = []
+        else:
+            # removing orgunits that will be added again later to avoid duplicates
+            tmp[:] = [p for p in tmp if p['id'] not in orgunit_list]
     else:
-        print(u"Replacing orgunits...")
         tmp = []
     for ou in orgunit_list:
         tmp.append({"id": ou})
@@ -119,14 +120,23 @@ def main():
         program = api.get('programs/{}'.format(program_uid), params=params_get)
         updated = set_program_orgunits(program, orgunit_list, args.append_orgunits)
         metadata_payload.append(updated)
-        print(u"[{}] - Assigning \033[1m{}\033[0m OrgUnits to Program \033[1m{}\033[0m...".format(args.server, len(orgunit_list), program['name']))
 
-    final['programs'] = metadata_payload
-    params_post = {
-        "mergeMode": "REPLACE",
-        "strategy": "UPDATE"
-    }
-    api.post(endpoint='metadata', params=params_post, payload=final)
+        with open('backup_{}.json'.format(program_uid), 'w') as f:
+            json.dump(program, f, indent=4)
+
+        print(
+            u"[{}] - Assigning \033[1m{} (total: {})\033[0m "
+            u"OrgUnits to Program \033[1m{}\033[0m...".format(args.server,
+                                                              len(orgunit_list),
+                                                              len(program['organisationUnits']),
+                                                              program['name']))
+
+        final['programs'] = [updated]
+        params_post = {
+            "mergeMode": "REPLACE",
+            "strategy": "UPDATE"
+        }
+        api.post(endpoint='metadata', params=params_post, payload=final)
 
 
 if __name__ == "__main__":
