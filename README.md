@@ -5,6 +5,7 @@
 * Program to Organisation Unit Assigner via CSV: `hnqis-program-orgunit --help`
 * Attribute setting via CSV: `hnqis-attribute-setting --help`
 * Health area indicators update (with program indicators) `hnqis-indicator-update --help`
+* User messages via CSV: `hnqis-user-message --help`
 
 ### Installation / updating
 
