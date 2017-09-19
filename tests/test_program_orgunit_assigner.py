@@ -157,7 +157,7 @@ def test_set_program_orgunits_append(program_orgunit_map, program_metadata):
     assert expected1 in updated_metadata['organisationUnits']
     assert expected2 in updated_metadata['organisationUnits']
     assert expected3 in updated_metadata['organisationUnits']
-    assert len(updated_metadata['organisationUnits']) == 3
+    assert len(updated_metadata['organisationUnits']) == 4
 
     # assert other values have not changed
     updated_metadata.pop('organisationUnits')
@@ -174,7 +174,7 @@ def test_set_program_orgunits_append_existing(program_orgunit_map2, program_meta
     assert expected1 in updated_metadata['organisationUnits']
     assert expected2 in updated_metadata['organisationUnits']
     assert expected3 in updated_metadata['organisationUnits']
-    assert len(updated_metadata['organisationUnits']) == 3
+    assert len(updated_metadata['organisationUnits']) == 4
 
     # assert other values have not changed
     updated_metadata.pop('organisationUnits')
