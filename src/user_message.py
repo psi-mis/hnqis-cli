@@ -85,8 +85,7 @@ def main():
         user_updated = create_or_update_attributevalues(obj=user, attribute_uid=USER_MESSAGE_UID,
                                                         attribute_value=attribute_value)
         api.put('users/{}'.format(user_uid), params=None, payload=user_updated)
-        print(u"{}/{} - Added message for username \033[1m{}\033[0m".format(i, len(data), attribute_value,
-                                                                                        username))
+        print(u"{}/{} - Added message for username \033[1m{}\033[0m".format(i, len(data), username))
 
 
 if __name__ == "__main__":
