@@ -7,10 +7,32 @@ from copy import deepcopy
 
 from __init__ import *
 
-PRODUCTIVITY_UID = 'pt5Ll9bb2oP'
-USER_MESSAGE_UID = 'ct3X8eB5gRj'
-OBJ_TYPES = {'organisationUnits', 'users'}
-
+OBJ_TYPES = {
+    "categoryOptions",
+    "categoryOptionCombinations",
+    "categoryOptionGroups",
+    "constants",
+    "dataElements",
+    "dataElementGroups",
+    "dataSets",
+    "documents",
+    "indicators",
+    "indicatorGroups",
+    "legends",
+    "options",
+    "optionSets",
+    "organisationUnits",
+    "organisationUnitGroups",
+    "programs",
+    "programIndiators",
+    "programStages",
+    "sections",
+    "sqlViews",
+    "trackedEntities",
+    "trackedEntityAttributes",
+    "users",
+    "userGroups"
+}
 
 def parse_args():
     usage = "hnqis-attribute-setting [-s] [-u] [-p] -c -t -a" \
@@ -29,8 +51,7 @@ def parse_args():
                         required=True)
     parser.add_argument('-t', dest='object_type', action='store', help="DHIS2 object type to set attribute values",
                         required=True, choices=OBJ_TYPES)
-    parser.add_argument('-a', dest='attribute_uid', action='store', help='Attribute UID', required=True,
-                        choices={PRODUCTIVITY_UID, USER_MESSAGE_UID})
+    parser.add_argument('-a', dest='attribute_uid', action='store', help='Attribute UID', required=True)
     parser.add_argument('-u', dest='username', action='store', help="DHIS2 username")
     parser.add_argument('-p', dest='password', action='store', help="DHIS2 password")
     parser.add_argument('-d', dest='debug', action='store_true', default=False, required=False,
@@ -85,9 +106,8 @@ def main():
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
 
-    if '.psi-mis.org' not in args.server:
-        log_info("This script is intended only for *.psi-mis.org")
-        sys.exit()
+    if not valid_uid(args.attribute_uid):
+        log_info("Attribute {} is not a valid UID".format(args.attribute_uid))
 
     data = load_csv(args.source_csv)
     validate_csv(data)
