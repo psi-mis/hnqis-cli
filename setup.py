@@ -105,7 +105,7 @@ setup(
             'hnqis-program-orgunit=src.program_orgunit_assigner:main',
             'hnqis-indicator-update=src.indicator_healtharea_updater:main',
             'hnqis-user-message=src.user_message:main',
-            'hnqis-usergroup-usernames=src.usergroup_usernames_main'
+            'hnqis-usergroup-usernames=src.usergroup_usernames:main'
         ],
     },
     install_requires=REQUIRED,
