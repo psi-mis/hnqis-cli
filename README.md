@@ -6,6 +6,7 @@
 * Attribute setting via CSV: `hnqis-attribute-setting --help`
 * Health area indicators update (with program indicators) `hnqis-indicator-update --help`
 * User messages via CSV: `hnqis-user-message --help`
+* Scan (and fix) Events where `Overall Score` != `_Overall Score`: `hnqis-scan-mismatches --help`
 
 ### Installation / updating
 

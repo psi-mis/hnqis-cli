@@ -215,7 +215,7 @@ class Dhis(Config):
             if r.status_code != 200:
                 self.abort(r)
 
-    def put(self, endpoint, params, payload):
+    def put(self, endpoint, payload, params=None):
         url = '{}/{}'.format(self.api_url, endpoint)
         log_debug(u"PUT: {} \n parameters: {} \n payload: {}".format(url, json.dumps(params), json.dumps(payload)))
 
