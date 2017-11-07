@@ -77,15 +77,19 @@ def main():
             'filter': 'userCredentials.userInfo.userCredentials.username:eq:{}'.format(username)
         }
         lookup = api.get('users', params=params_user)
-        user_uid = lookup['users'][0]['id']
-
-        attribute_value = obj.get('message')
-        params_get = {'fields': ':owner,userGroups'}
-        user = api.get('users/{}'.format(user_uid), params=params_get)
-        user_updated = create_or_update_attributevalues(obj=user, attribute_uid=USER_MESSAGE_UID,
-                                                        attribute_value=attribute_value)
-        api.put('users/{}'.format(user_uid), params=None, payload=user_updated)
-        print(u"{}/{} - Added message for username \033[1m{}\033[0m".format(i, len(data), username))
+        try:
+            user_uid = lookup['users'][0]['id']
+        except IndexError:
+            print(u"User with username {} could not be found. Skipping...".format(username))
+            pass
+        else:
+            attribute_value = obj.get('message')
+            params_get = {'fields': ':owner,userGroups'}
+            user = api.get('users/{}'.format(user_uid), params=params_get)
+            user_updated = create_or_update_attributevalues(obj=user, attribute_uid=USER_MESSAGE_UID,
+                                                            attribute_value=attribute_value)
+            api.put('users/{}'.format(user_uid), params=None, payload=user_updated)
+            print(u"{}/{} - Added message for username \033[1m{}\033[0m".format(i, len(data), username))
 
 
 if __name__ == "__main__":
