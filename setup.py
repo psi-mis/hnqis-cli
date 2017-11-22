@@ -20,7 +20,7 @@ AUTHOR = 'PSI MIS'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests', 'unicodecsv', 'six'
+    'requests', 'unicodecsv'
 ]
 here = os.path.abspath(os.path.dirname(__file__))
 
