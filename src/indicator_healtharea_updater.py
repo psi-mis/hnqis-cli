@@ -118,11 +118,8 @@ def main():
         no_of_programs = len(data3['programs'])
 
         if no_of_programs != len(pi_uids):
-            print(
-                u"\033[1mWarning\033[1m{}\033[0m -- programs: {} VS # count programIndicators {} (ids): {}".format(no_of_programs,
-                                                                                              len(pi_uids),
-                                                                                               json.dumps(pi_uids)))
-
+            print(u"\033[1mWarning\033[1m{}\033[0m - number of programs does not match number of 'count' programIndicators!")
+            
         if len(data2['indicators']) == 1:
             i = data2['indicators'][0]
             i['numerator'] = create_numerator(pi_uids)
