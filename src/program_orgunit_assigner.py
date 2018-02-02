@@ -89,7 +89,7 @@ def set_program_orgunits(program, orgunit_list, append_orgunits):
 def main():
     args = parse_args()
     #init_logger(args.debug)
-    log_start_info(__file__)
+    #log_start_info(__file__)
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
 

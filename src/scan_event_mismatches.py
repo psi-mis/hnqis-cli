@@ -54,7 +54,7 @@ def analyze_event(program, event, root_compscores):
 def main():
     args = parse_args()
     #init_logger(args.debug)
-    log_start_info(__file__)
+    #log_start_info(__file__)
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
     p = {
