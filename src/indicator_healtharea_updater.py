@@ -25,7 +25,8 @@ HEALTH_AREAS = [
     'VMMC',
     'VP',
     'WASH',
-    'WEA'
+    'WEA',
+    'DQI'
 ]
 
 
