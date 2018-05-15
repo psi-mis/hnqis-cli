@@ -89,7 +89,7 @@ def main():
         else:
             p1 = {
                 'paging': False,
-                'filter': ['name:$like:HNQIS - {} count'.format(ha)],
+                'filter': ['name:like:HNQIS - {} count'.format(ha)],
                 'fields': '[id,name]'
             }
         data1 = api.get('programIndicators', params=p1)
@@ -119,14 +119,14 @@ def main():
         no_of_programs = len(data3['programs'])
 
         if no_of_programs != len(pi_uids):
-            print(u"\033[1mWarning\033[1m{}\033[0m - number of programs does not match number of 'count' programIndicators!")
+            print(u"\033[1mWarning\033[1m{}\033[0m - number of programs "
+                  u"does not match number of 'count' programIndicators!")
 
         if len(data2['indicators']) == 1:
             i = data2['indicators'][0]
             i['numerator'] = create_numerator(pi_uids)
             container.append(i)
             print(u'  \033[1m{}\033[0m - Added {} programIndicators to numerator of indicator "{}"'.format(ha, len(pi_uids), i['name']))
-
 
         elif len(data2['indicators']) > 1:
             print(u"\033[1mMore than one indicator found for health area {}\033[0m".format(ha))
