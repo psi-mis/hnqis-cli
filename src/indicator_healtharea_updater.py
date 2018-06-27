@@ -9,6 +9,7 @@ from __init__ import *
 HEALTH_AREAS = [
     'CC',
     'CBRM',
+    'DQI',
     'FP',
     'FP CFC',
     'FP SAM',
@@ -26,7 +27,6 @@ HEALTH_AREAS = [
     'VP',
     'WASH',
     'WEA',
-    'DQI'
 ]
 
 
@@ -83,13 +83,20 @@ def main():
         if ha == 'VMMC':
             p1 = {
                 'paging': False,
-                'filter': ['name:like:HNQIS - {}'.format(ha), 'name:$like:count'],
+                'filter': [
+                    'name:like:HNQIS - {}'.format(ha),
+                    'name:$like:count',
+                    'program.name:!like:v1'  # don't get v1 programIndicators
+                ],
                 'fields': '[id,name]'
             }
         else:
             p1 = {
                 'paging': False,
-                'filter': ['name:like:HNQIS - {} count'.format(ha)],
+                'filter': [
+                    'name:like:HNQIS - {} count'.format(ha),
+                    'program.name:!like:v1'  # don't get v1 programIndicators
+                ],
                 'fields': '[id,name]'
             }
         data1 = api.get('programIndicators', params=p1)
@@ -106,21 +113,28 @@ def main():
         if ha == 'VMMC':
             p3 = {
                 'paging': False,
-                'filter': 'shortName:like: HNQIS {}'.format(ha),
+                'filter': [
+                    'shortName:like: HNQIS {}'.format(ha),
+                    'name:!like:v1'
+                ],
                 'fields': 'id,name'
             }
         else:
             p3 = {
                 'paging': False,
-                'filter': 'shortName:$like: HNQIS {}'.format(ha),
+                'filter': [
+                    'shortName:$like: HNQIS {}'.format(ha),  # 2.30 would need to change filters
+                    'name:!like:v1'
+                ],
                 'fields': 'id,name'
             }
         data3 = api.get('programs', params=p3)
         no_of_programs = len(data3['programs'])
 
         if no_of_programs != len(pi_uids):
-            print(u"\033[1mWarning\033[1m{}\033[0m - number of programs "
-                  u"does not match number of 'count' programIndicators!")
+            print(u"\033[1mWarning\033[1m\033[0m - number of {} programs ({}) "
+                  u"does not match number of 'count' programIndicators ({})!".format(ha, no_of_programs, len(pi_uids)))
+            print("\n".join([x['name'] for x in data3['programs']]))
 
         if len(data2['indicators']) == 1:
             i = data2['indicators'][0]
