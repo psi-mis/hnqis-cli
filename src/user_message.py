@@ -3,9 +3,10 @@
 
 import argparse
 import time
+import sys
 
-from __init__ import *
-from src.attribute_setter import create_or_update_attributevalues
+from __init__ import CsvException, load_csv, Dhis, log_info
+from attribute_setter import create_or_update_attributevalues
 
 USER_MESSAGE_UID = 'ct3X8eB5gRj'
 
