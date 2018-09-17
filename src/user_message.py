@@ -39,8 +39,10 @@ def validate_csv(data):
         raise ValueError("CSV not valid: CSV must have 'username' and 'message' as headers")
 
     object_uids = [obj['username'] for obj in data]
-    if len(object_uids) != len(set(object_uids)):
-        raise ValueError("Duplicate Objects (rows) found in the CSV")
+
+    duplicates = set([x for x in object_uids if object_uids.count(x) > 1])
+    if duplicates:
+        raise ValueError("Duplicate users found in the CSV: {}".format(', '.join(duplicates)))
     return True
 
 
@@ -56,8 +58,7 @@ def main():
     data = list(load_csv(args.source_csv))
     validate_csv(data)
 
-    attr_get = {'fields': 'id,name,userAttribute'}
-    attr = api.get('attributes/{}'.format(USER_MESSAGE_UID), params=attr_get)
+    attr = api.get('attributes/{}'.format(USER_MESSAGE_UID), params={'fields': 'id,name,userAttribute'}).json()
     if attr['userAttribute'] is False:
         logger.error("Attribute {} is not assigned to Users".format(USER_MESSAGE_UID))
 
@@ -75,7 +76,7 @@ def main():
             'fields': 'id,name',
             'filter': 'userCredentials.userInfo.userCredentials.username:eq:{}'.format(username)
         }
-        lookup = api.get('users', params=params_user)
+        lookup = api.get('users', params=params_user).json()
         try:
             user_uid = lookup['users'][0]['id']
         except IndexError:
@@ -84,7 +85,7 @@ def main():
         else:
             attribute_value = obj.get('message')
             params_get = {'fields': ':owner,userGroups'}
-            user = api.get('users/{}'.format(user_uid), params=params_get)
+            user = api.get('users/{}'.format(user_uid), params=params_get).json()
             user_updated = create_or_update_attributevalues(obj=user, attribute_uid=USER_MESSAGE_UID,
                                                             attribute_value=attribute_value)
             try:

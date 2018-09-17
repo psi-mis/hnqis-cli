@@ -115,7 +115,7 @@ def main():
     validate_csv(data)
 
     attr_get = {'fields': 'id,name,{}Attribute'.format(args.object_type[:-1])}
-    attr = api.get('attributes/{}'.format(args.attribute_uid), params=attr_get)
+    attr = api.get('attributes/{}'.format(args.attribute_uid), params=attr_get).json()
     if attr['{}Attribute'.format(args.object_type[:-1])] is False:
         logger.error("Attribute {} is not assigned to type {}".format(args.attribute_uid, args.object_type[:-1]))
 
@@ -132,7 +132,7 @@ def main():
         obj_uid = obj.get('key')
         attribute_value = obj.get('value')
         params_get = {'fields': ':owner'}
-        obj_old = api.get('{}/{}'.format(args.object_type, obj_uid), params=params_get)
+        obj_old = api.get('{}/{}'.format(args.object_type, obj_uid), params=params_get).json()
         obj_updated = create_or_update_attributevalues(obj=obj_old, attribute_uid=args.attribute_uid,
                                                        attribute_value=attribute_value)
         api.put('{}/{}'.format(args.object_type, obj_uid), params=None, data=obj_updated)

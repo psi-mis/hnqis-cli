@@ -116,7 +116,7 @@ def main():
     final = {}
     for program_uid, orgunit_list in iteritems(program_orgunit_map):
         params_get = {'fields': ':owner'}
-        program = api.get('programs/{}'.format(program_uid), params=params_get)
+        program = api.get('programs/{}'.format(program_uid), params=params_get).json()
         updated = set_program_orgunits(program, orgunit_list, args.append_orgunits)
         metadata_payload.append(updated)
 

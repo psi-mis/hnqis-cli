@@ -99,7 +99,7 @@ def main():
                 ],
                 'fields': '[id,name]'
             }
-        data1 = api.get('programIndicators', params=p1)
+        data1 = api.get('programIndicators', params=p1).json()
         pi_uids = [p['id'] for p in data1['programIndicators']]
 
         p2 = {
@@ -107,7 +107,7 @@ def main():
             'filter': ['name:eq:HNQIS - {} count'.format(ha)],
             'fields': ':owner'
         }
-        data2 = api.get('indicators', params=p2)
+        data2 = api.get('indicators', params=p2).json()
         backup_indicators.append(data2['indicators'])
 
         if ha == 'VMMC':
@@ -128,7 +128,7 @@ def main():
                 ],
                 'fields': 'id,name'
             }
-        data3 = api.get('programs', params=p3)
+        data3 = api.get('programs', params=p3).json()
         no_of_programs = len(data3['programs'])
 
         if no_of_programs != len(pi_uids):

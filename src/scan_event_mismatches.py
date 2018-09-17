@@ -71,7 +71,7 @@ def main():
         'paging': False,
         'fields': 'id'
     }
-    root_compscores = [x['id'] for x in api.get('dataElements', params=csparams)['dataElements']]
+    root_compscores = [x['id'] for x in api.get('dataElements', params=csparams).json()['dataElements']]
 
     for p in programs['programs']:
         params = {
@@ -79,7 +79,7 @@ def main():
             'skipPaging': True,
             'fields': '[*]'
         }
-        events = api.get('events', params=params)
+        events = api.get('events', params=params).json()
         for event in events['events']:
             if analyze_event(p, event, root_compscores):
                 fix_them.append(event)
