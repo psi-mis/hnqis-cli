@@ -1,4 +1,7 @@
 import pytest
+import os
+
+from six import itervalues
 
 from src.program_orgunit_assigner import *
 
@@ -6,52 +9,48 @@ PATH = os.path.join('tests', 'csv', 'program_orgunits')
 
 
 def test_csv_valid():
-    f = load_csv(path=os.path.join(PATH, 'valid.csv'))
+    f = list(load_csv(os.path.join(PATH, 'valid.csv')))
     assert validate_csv(f)
 
 
 def test_csv_empty():
-    with pytest.raises(CsvException):
-        load_csv(path=os.path.join(PATH, 'empty.csv'))
-
-
-def test_csv_no_programs():
-    with pytest.raises(CsvException):
-        load_csv(path=os.path.join(PATH, 'no_programs.csv'))
+    f = list(load_csv(os.path.join(PATH, 'empty.csv')))
+    with pytest.raises(ValueError):
+        validate_csv(f)
 
 
 def test_csv_ogrunit():
-    f = load_csv(path=os.path.join(PATH, 'ogrunit.csv'))
-    with pytest.raises(CsvException):
+    f = list(load_csv(os.path.join(PATH, 'ogrunit.csv')))
+    with pytest.raises(ValueError):
         validate_csv(f)
 
 
 def test_csv_duplicate_orgunits():
-    f = load_csv(path=os.path.join(PATH, 'duplicate_orgunits.csv'))
-    with pytest.raises(CsvException):
+    f = list(load_csv(os.path.join(PATH, 'duplicate_orgunits.csv')))
+    with pytest.raises(ValueError):
         validate_csv(f)
 
 
 def test_csv_no_valid_orgunits():
-    f = load_csv(path=os.path.join(PATH, 'no_valid_orgunits.csv'))
-    with pytest.raises(CsvException):
+    f = list(load_csv(os.path.join(PATH, 'no_valid_orgunits.csv')))
+    with pytest.raises(ValueError):
         validate_csv(f)
 
 
 def test_csv_no_valid_programs():
-    f = load_csv(path=os.path.join(PATH, 'no_valid_programs.csv'))
-    with pytest.raises(CsvException):
+    f = list(load_csv(os.path.join(PATH, 'no_valid_programs.csv')))
+    with pytest.raises(ValueError):
         validate_csv(f)
 
 
 def test_program_orgunit_map():
-    f = load_csv(path=os.path.join(PATH, 'full.csv'))
+    f = list(load_csv(os.path.join(PATH, 'full.csv')))
     mapped = get_program_orgunit_map(f)
     assert set(mapped['lxAQ7Zs9VYR']) == {'HlDMbDWUmTy', 'Rp268JB6Ne4', 'cDw53Ej8rju'}
     assert set(mapped['IpHINAT79UW']) == {'cDw53Ej8rju'}
     assert set(mapped['kla3mAPgvCH']) == {'HlDMbDWUmTy', 'cDw53Ej8rju'}
     # test orgunit is not in any program
-    assert 'c41XRVOYNJm' not in set([x for item in mapped.itervalues() for x in item])
+    assert 'c41XRVOYNJm' not in set([x for item in itervalues(mapped) for x in item])
     # test orgunit is in program map even though the value was ' yes' or 'YES'
     assert 'HlDMbDWUmTy' in mapped['WSGAb5XwJ3Y']
     assert 'cDw53Ej8rju' in mapped['WSGAb5XwJ3Y']

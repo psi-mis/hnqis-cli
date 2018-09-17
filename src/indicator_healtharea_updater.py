@@ -3,8 +3,10 @@
 
 import argparse
 import time
+import json
+from datetime import datetime
 
-from __init__ import *
+from dhis2 import Dhis, setup_logger, logger
 
 HEALTH_AREAS = [
     'CC',
@@ -59,19 +61,17 @@ def dump_to_file(data):
     filename = "healtharea_indicators_backup_{}.json".format(ts)
     with open(filename, 'w') as out:
         json.dump(data, out, indent=4)
-    print(u"Before state backed up to \033[1m{}\033[0m".format(filename))
+    logger.info("Before state backed up to \033[1m{}\033[0m".format(filename))
 
 
 def main():
     args = parse_args()
-    #init_logger(args.debug)
-    #log_start_info(__file__)
+    setup_logger()
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
 
     if '.psi-mis.org' not in args.server:
-        log_info("This script is intended only for *.psi-mis.org")
-        sys.exit()
+        logger.warn("This script is intended only for *.psi-mis.org")
 
     indicators = {}
     backup_indicators = []
@@ -153,7 +153,7 @@ def main():
     print(u"Posting updated programindicators to \033[1m{}\033[0m...".format(args.server))
     time.sleep(3)
 
-    api.post('metadata', params={'importMode': 'COMMIT', 'preheatCache': False}, payload=indicators)
+    api.post('metadata', params={'importMode': 'COMMIT', 'preheatCache': False}, data=indicators)
 
 
 if __name__ == "__main__":

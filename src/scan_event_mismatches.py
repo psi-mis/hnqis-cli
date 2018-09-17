@@ -3,11 +3,12 @@
 
 import argparse
 
-from __init__ import *
+from dhis2 import Dhis, setup_logger, logger
 
 THRESHOLD = 1
 ORDER_FORWARD = 'FEkGksxhOpH'
 OVERALL_SCORE = 'Y8Nmpp7RhXw'
+
 
 def parse_args():
     usage = "hnqis-scan-mismatches [-s] [-u] [-p] -x" \
@@ -30,7 +31,7 @@ def parse_args():
 def fix_event(event, root_compscores):
     """Adjust data values: overwrite _Overall Score with 0CS-100 value and set order forward to be 9999"""
     datavalues = event['dataValues']
-    for i in xrange(len(datavalues)):
+    for i in range(len(datavalues)):
         if datavalues[i]['dataElement'] == ORDER_FORWARD:
             event['dataValues'][i]['value'] = '9999'
         if datavalues[i]['dataElement'] == OVERALL_SCORE:
@@ -53,8 +54,7 @@ def analyze_event(program, event, root_compscores):
 
 def main():
     args = parse_args()
-    #init_logger(args.debug)
-    #log_start_info(__file__)
+    setup_logger()
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
     p = {
@@ -85,13 +85,13 @@ def main():
                 fix_them.append(event)
 
     if fix_them and args.fix_values:
-        print(u"Fixing those events and resetting _Order Forward...")
+        logger.info(u"Fixing those events and resetting _Order Forward...")
         for i, e in enumerate(fix_them, 1):
             fixed = fix_event(e, root_compscores)
-            print(u"[{}/{}] Pushing event {}...".format(i, len(fix_them), e['event']))
-            api.put('events/{}'.format(e['event']), payload=fixed)
+            logger.info(u"[{}/{}] Pushing event {}...".format(i, len(fix_them), e['event']))
+            api.put('events/{}'.format(e['event']), data=fixed)
     else:
-        print(u"Not fixing events")
+        logger.warn(u"Not fixing events")
 
 if __name__ == '__main__':
     main()

@@ -5,7 +5,9 @@ import argparse
 import time
 from copy import deepcopy
 
-from __init__ import *
+from dhis2 import Dhis, setup_logger, logger, load_csv
+
+from .utils import valid_uid
 
 OBJ_TYPES = {
     "categoryOptions",
@@ -33,6 +35,7 @@ OBJ_TYPES = {
     "users",
     "userGroups"
 }
+
 
 def parse_args():
     usage = "hnqis-attribute-setting [-s] [-u] [-p] -c -t -a" \
@@ -62,14 +65,14 @@ def parse_args():
 
 def validate_csv(data):
     if not data[0].get('key', None) or not data[0].get('value', None):
-        raise CsvException("CSV not valid: CSV must have 'key' and 'value' as headers")
+        raise ValueError("CSV not valid: CSV must have 'key' and 'value' as headers")
 
     object_uids = [obj['key'] for obj in data]
     for uid in object_uids:
         if not valid_uid(uid):
-            raise CsvException("Object {} is not a valid UID in the CSV".format(uid))
+            raise ValueError("Object {} is not a valid UID in the CSV".format(uid))
     if len(object_uids) != len(set(object_uids)):
-        raise CsvException("Duplicate Objects (rows) found in the CSV")
+        raise ValueError("Duplicate Objects (rows) found in the CSV")
     return True
 
 
@@ -101,27 +104,28 @@ def create_or_update_attributevalues(obj, attribute_uid, attribute_value):
 
 def main():
     args = parse_args()
-    #init_logger(args.debug)
-    #log_start_info(__file__)
+    setup_logger()
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
 
     if not valid_uid(args.attribute_uid):
-        log_info("Attribute {} is not a valid UID".format(args.attribute_uid))
+        logger.error("Attribute {} is not a valid UID".format(args.attribute_uid))
 
-    data = load_csv(args.source_csv)
+    data = list(load_csv(args.source_csv))
     validate_csv(data)
 
     attr_get = {'fields': 'id,name,{}Attribute'.format(args.object_type[:-1])}
     attr = api.get('attributes/{}'.format(args.attribute_uid), params=attr_get)
     if attr['{}Attribute'.format(args.object_type[:-1])] is False:
-        log_info("Attribute {} is not assigned to type {}".format(args.attribute_uid, args.object_type[:-1]))
+        logger.error("Attribute {} is not assigned to type {}".format(args.attribute_uid, args.object_type[:-1]))
 
-    print(u"[{}] - Updating Attribute Values for Attribute \033[1m{}\033[0m for \033[1m{}\033[0m \033[1m{}\033[0m...".format(args.server, args.attribute_uid, len(data), args.object_type))
+    logger.info(
+        "[{}] - Updating Attribute Values for Attribute \033[1m{}\033[0m for \033[1m{}\033[0m \033[1m{}\033[0m...".format(
+            args.server, args.attribute_uid, len(data), args.object_type))
     try:
         time.sleep(3)
     except KeyboardInterrupt:
-        print("\033[1m{}\033[0m".format("Aborted!"))
+        logger.warn("\033[1m{}\033[0m".format("Aborted!"))
         pass
 
     for i, obj in enumerate(data, 1):
@@ -129,9 +133,11 @@ def main():
         attribute_value = obj.get('value')
         params_get = {'fields': ':owner'}
         obj_old = api.get('{}/{}'.format(args.object_type, obj_uid), params=params_get)
-        obj_updated = create_or_update_attributevalues(obj=obj_old, attribute_uid=args.attribute_uid, attribute_value=attribute_value)
-        api.put('{}/{}'.format(args.object_type, obj_uid), params=None, payload=obj_updated)
-        print(u"{}/{} - Updated AttributeValue: {} - \033[1m{}:\033[0m {}".format(i, len(data), attribute_value, args.object_type[:-1], obj_uid))
+        obj_updated = create_or_update_attributevalues(obj=obj_old, attribute_uid=args.attribute_uid,
+                                                       attribute_value=attribute_value)
+        api.put('{}/{}'.format(args.object_type, obj_uid), params=None, data=obj_updated)
+        logger.info(u"{}/{} - Updated AttributeValue: {} - {}: {}".format(i, len(data), attribute_value,
+                                                                                        args.object_type[:-1], obj_uid))
 
 
 if __name__ == "__main__":

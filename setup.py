@@ -20,14 +20,9 @@ AUTHOR = 'PSI MIS'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'requests', 'unicodecsv'
+    'dhis2.py'
 ]
 here = os.path.abspath(os.path.dirname(__file__))
-
-# Import the README and use it as the long-description.
-# Note: this will only work if 'README.rst' is present in your MANIFEST.in file!
-with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-    long_description = '\n' + f.read()
 
 # Load the package's __version__.py module as a dictionary.
 about = {}
@@ -87,12 +82,12 @@ class TestCommand(Command):
         self.status('Testing with pytest...')
         os.system('python -m pytest tests -sv')
 
+
 # Where the magic happens:
 setup(
     name=NAME,
     version=about['__version__'],
     description=DESCRIPTION,
-    long_description=long_description,
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
@@ -105,7 +100,6 @@ setup(
             'hnqis-program-orgunit=src.program_orgunit_assigner:main',
             'hnqis-indicator-update=src.indicator_healtharea_updater:main',
             'hnqis-user-message=src.user_message:main',
-            'hnqis-usergroup-usernames=src.usergroup_usernames:main',
             'hnqis-scan-mismatches=src.scan_event_mismatches:main'
         ],
     },
@@ -113,7 +107,6 @@ setup(
     include_package_data=True,
     test_suite='pytest',
     tests_require=['pytest'],
-    setup_requires=['pytest-runner'],
     license='GPLv3',
     classifiers=[
         # Trove classifiers

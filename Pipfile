@@ -1,0 +1,10 @@
+[[source]]
+url = "https://pypi.org/simple"
+name = "pypi"
+verify_ssl = true
+
+[dev-packages]
+pytest = "*"
+
+[packages]
+"dhis2.py" = "1.5.1"

@@ -2,9 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import json
 from copy import deepcopy
 
-from __init__ import *
+from dhis2 import Dhis, setup_logger, logger, load_csv
+from six import iteritems
+
+from .utils import valid_uid
 
 
 def parse_args():
@@ -32,26 +36,26 @@ def parse_args():
 
 def validate_csv(data):
     if not data:
-        raise CsvException(" CSV not valid (empty?)")
+        raise ValueError(" CSV not valid (empty?)")
 
     if not data[0].get('orgunit', None):
-        raise CsvException(u"+++ CSV not valid: CSV must have 'orgunit' header")
+        raise ValueError(u"+++ CSV not valid: CSV must have 'orgunit' header")
 
     if len(data[0]) <= 1:
-        raise CsvException(u"+++ No programs found in CSV")
+        raise ValueError(u"+++ No programs found in CSV")
 
     orgunit_uids = [ou['orgunit'] for ou in data]
     if len(orgunit_uids) != len(set(orgunit_uids)):
-        raise CsvException(u"Duplicate Orgunits (rows) found in the CSV")
+        raise ValueError(u"Duplicate Orgunits (rows) found in the CSV")
 
     for ou in orgunit_uids:
         if not valid_uid(ou):
-            raise CsvException(u"OrgUnit {} is not a valid UID in the CSV".format(ou))
+            raise ValueError(u"OrgUnit {} is not a valid UID in the CSV".format(ou))
 
     for row in data:
         for p in row.keys():
             if not valid_uid(p) and p != 'orgunit':
-                raise CsvException(u"Program {} is not a valid UID in the CSV".format(p))
+                raise ValueError(u"Program {} is not a valid UID in the CSV".format(p))
     return True
 
 
@@ -61,7 +65,7 @@ def get_program_orgunit_map(data):
     #  "programuid":["orgunitid1", ...],
     # }
     for row in data:
-        for k, v in row.iteritems():
+        for k, v in iteritems(row):
             if k != 'orgunit' and v.lower().strip() == 'yes':
                 if k not in program_orgunit_map:
                     program_orgunit_map[k] = list()
@@ -88,21 +92,16 @@ def set_program_orgunits(program, orgunit_list, append_orgunits):
 
 def main():
     args = parse_args()
-    #init_logger(args.debug)
-    #log_start_info(__file__)
+    setup_logger()
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
 
-    """
-    if '.psi-mis.org' not in args.server:
-        log_info("This script is intended only for *.psi-mis.org")
-        sys.exit()
-    """
-
-    data = load_csv(args.source_csv)
+    data = list(load_csv(args.source_csv))
     validate_csv(data)
 
     programs_csv = [h.strip() for h in data[0] if h != 'orgunit']
+    if not programs_csv:
+        raise ValueError('No programs found')
     params_get = {
         'fields': 'id',
         'paging': False
@@ -110,12 +109,12 @@ def main():
     programs_server = [p['id'] for p in api.get('programs', params=params_get)['programs']]
     for p in programs_csv:
         if p not in programs_server:
-            print(u"Program {0} is not a valid program: {1}/programs/{0}.json".format(p, api.api_url))
+            logger.error(u"Program {0} is not a valid program: {1}/programs/{0}.json".format(p, api.api_url))
 
     program_orgunit_map = get_program_orgunit_map(data)
     metadata_payload = []
     final = {}
-    for program_uid, orgunit_list in program_orgunit_map.iteritems():
+    for program_uid, orgunit_list in iteritems(program_orgunit_map):
         params_get = {'fields': ':owner'}
         program = api.get('programs/{}'.format(program_uid), params=params_get)
         updated = set_program_orgunits(program, orgunit_list, args.append_orgunits)
@@ -136,7 +135,7 @@ def main():
             "mergeMode": "REPLACE",
             "strategy": "UPDATE"
         }
-        api.post(endpoint='metadata', params=params_post, payload=final)
+        api.post(endpoint='metadata', params=params_post, data=final)
 
 
 if __name__ == "__main__":

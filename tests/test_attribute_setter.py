@@ -1,3 +1,4 @@
+import os
 import pytest
 
 from src.attribute_setter import *
@@ -9,25 +10,20 @@ PATH = os.path.join('tests', 'csv', 'attribute_setter')
 
 
 def test_csv_file_valid():
-    f = load_csv(path=os.path.join(PATH, 'valid.csv'))
+    f = list(load_csv(path=os.path.join(PATH, 'valid.csv')))
     assert validate_csv(f)
 
 
 def test_csv_duplicate_objects():
-    f = load_csv(path=os.path.join(PATH, 'duplicates.csv'))
-    with pytest.raises(CsvException):
+    f = list(load_csv(path=os.path.join(PATH, 'duplicates.csv')))
+    with pytest.raises(ValueError):
         validate_csv(f)
 
 
 def test_csv_no_valid_uid():
-    f = load_csv(path=os.path.join(PATH, 'no_valid_uid.csv'))
-    with pytest.raises(CsvException):
+    f = list(load_csv(path=os.path.join(PATH, 'no_valid_uid.csv')))
+    with pytest.raises(ValueError):
         validate_csv(f)
-
-
-def test_csv_semicolon():
-    f = load_csv(path=os.path.join(PATH, 'semicolon.csv'))
-    assert validate_csv(f)
 
 
 @pytest.fixture
