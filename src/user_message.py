@@ -91,10 +91,10 @@ def main():
             try:
                 api.put('users/{}'.format(user_uid), params=None, data=user_updated)
             except Exception as e:
-                print("failed: {} {}".format(user_uid, e))
+                logger.error("failed: {} {}".format(user_uid, e))
                 pass
             else:
-                print(u"{}/{} - Added message for username \033[1m{}\033[0m".format(i, len(data), username))
+                logger.info("{}/{} - Added message for username {}".format(i, len(data), username))
 
 
 if __name__ == "__main__":

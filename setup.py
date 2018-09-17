@@ -88,6 +88,7 @@ setup(
     name=NAME,
     version=about['__version__'],
     description=DESCRIPTION,
+    long_description="Check https://github.com/psi-mis/hnqis-cli for docs",
     author=AUTHOR,
     author_email=EMAIL,
     url=URL,
@@ -113,7 +114,9 @@ setup(
         # Full list: https://pypi.python.org/pypi?%3Aaction=list_classifiers
         'License :: OSI Approved :: GNU Affero General Public License v3',
         'Programming Language :: Python',
-        'Programming Language :: Python :: 2.7'
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6'
     ],
     # $ setup.py publish support.
     cmdclass={

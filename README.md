@@ -10,9 +10,11 @@
 
 ### Installation / updating
 
-* Installation with [pip](https://pip.pypa.io/en/stable/installing) (python package manager, see if it is installed: `pip -V`)
-* `pip install hnqis-cli` or `sudo -H pip install hnqis-cli`
-* Upgrade with `pip install hnqis-cli -U`
+```
+pip install hnqis-cli
+```
+
+Requires [pip](https://pip.pypa.io/en/stable/installing) (python package manager, see if it is installed: `pip -V`)
 
 ### Usage
 
@@ -31,14 +33,12 @@ cd hnqis-cli
 python setup.py install
 ```
 
-#### Source code disclaimer
-- The `src/__init__.py` file was copied/modified from [dhis2-pocket-knife](https://github.com/davidhuser/dhis2-pocket-knife) (MIT licence)
-
 
 #### Contribute
 
 - Fork repo
-- Install Dev requirements via `pip install -r requirements-dev.txt`
+- Install `pipenv` with `pip install pipenv`
+- Install Dev requirements via `pipenv install --dev`
 - Write a script in `src` folder, add it to `setup.py`'s `entry_points`
 - Write a test in `tests`, run all tests with `python setup.py test`
 - Open a Pull Request
