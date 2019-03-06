@@ -51,8 +51,8 @@ def main():
     setup_logger()
     api = Dhis(server=args.server, username=args.username, password=args.password)
 
-    if '.psi-mis.org' not in args.server:
-        logger.error("This script is intended only for *.psi-mis.org")
+    if '.psi-mis.org' not in args.server and '.hnqis.org' not in args.server:
+        logger.warn("This script is intended only for *.psi-mis.org or *.hnqis.org")
         sys.exit()
 
     data = list(load_csv(args.source_csv))

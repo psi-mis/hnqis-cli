@@ -5,6 +5,7 @@ import argparse
 import time
 import json
 from datetime import datetime
+import sys
 
 from dhis2 import Dhis, setup_logger, logger
 
@@ -70,8 +71,9 @@ def main():
 
     api = Dhis(server=args.server, username=args.username, password=args.password)
 
-    if '.psi-mis.org' not in args.server:
-        logger.warn("This script is intended only for *.psi-mis.org")
+    if '.psi-mis.org' not in args.server and '.hnqis.org' not in args.server:
+        logger.warn("This script is intended only for *.psi-mis.org or *.hnqis.org")
+        sys.exit(0)
 
     indicators = {}
     backup_indicators = []
