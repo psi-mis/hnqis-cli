@@ -7,4 +7,4 @@ verify_ssl = true
 pytest = "*"
 
 [packages]
-"dhis2.py" = "1.5.1"
+"dhis2.py" = "==1.5.1"
