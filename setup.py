@@ -5,7 +5,6 @@
 #   $ pip install twine
 #
 
-import io
 import os
 import sys
 from setuptools import find_packages, setup, Command
@@ -20,7 +19,7 @@ AUTHOR = 'PSI MIS'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
-    'dhis2.py'
+    'dhis2.py==2.0.2'
 ]
 here = os.path.abspath(os.path.dirname(__file__))
 

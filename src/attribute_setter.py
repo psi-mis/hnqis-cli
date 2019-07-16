@@ -5,9 +5,7 @@ import argparse
 import time
 from copy import deepcopy
 
-from dhis2 import Dhis, setup_logger, logger, load_csv
-
-from .utils import valid_uid
+from dhis2 import Api, setup_logger, logger, load_csv, is_valid_uid
 
 OBJ_TYPES = {
     "categoryOptions",
@@ -69,7 +67,7 @@ def validate_csv(data):
 
     object_uids = [obj['key'] for obj in data]
     for uid in object_uids:
-        if not valid_uid(uid):
+        if not is_valid_uid(uid):
             raise ValueError("Object {} is not a valid UID in the CSV".format(uid))
     if len(object_uids) != len(set(object_uids)):
         raise ValueError("Duplicate Objects (rows) found in the CSV")
@@ -106,9 +104,9 @@ def main():
     args = parse_args()
     setup_logger()
 
-    api = Dhis(server=args.server, username=args.username, password=args.password)
+    api = Api(server=args.server, username=args.username, password=args.password)
 
-    if not valid_uid(args.attribute_uid):
+    if not is_valid_uid(args.attribute_uid):
         logger.error("Attribute {} is not a valid UID".format(args.attribute_uid))
 
     data = list(load_csv(args.source_csv))

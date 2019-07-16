@@ -5,10 +5,8 @@ import argparse
 import json
 from copy import deepcopy
 
-from dhis2 import Dhis, setup_logger, logger, load_csv
+from dhis2 import Api, setup_logger, logger, load_csv, is_valid_uid
 from six import iteritems
-
-from .utils import valid_uid
 
 
 def parse_args():
@@ -49,12 +47,12 @@ def validate_csv(data):
         raise ValueError(u"Duplicate Orgunits (rows) found in the CSV")
 
     for ou in orgunit_uids:
-        if not valid_uid(ou):
+        if not is_valid_uid(ou):
             raise ValueError(u"OrgUnit {} is not a valid UID in the CSV".format(ou))
 
     for row in data:
         for p in row.keys():
-            if not valid_uid(p) and p != 'orgunit':
+            if not is_valid_uid(p) and p != 'orgunit':
                 raise ValueError(u"Program {} is not a valid UID in the CSV".format(p))
     return True
 
@@ -94,7 +92,7 @@ def main():
     args = parse_args()
     setup_logger()
 
-    api = Dhis(server=args.server, username=args.username, password=args.password)
+    api = Api(server=args.server, username=args.username, password=args.password)
 
     data = list(load_csv(args.source_csv))
     validate_csv(data)

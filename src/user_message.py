@@ -5,7 +5,7 @@ import argparse
 import sys
 import time
 
-from dhis2 import Dhis, setup_logger, logger, load_csv
+from dhis2 import Api, setup_logger, logger, load_csv
 from .attribute_setter import create_or_update_attributevalues
 
 USER_MESSAGE_UID = 'ct3X8eB5gRj'
@@ -49,7 +49,7 @@ def validate_csv(data):
 def main():
     args = parse_args()
     setup_logger()
-    api = Dhis(server=args.server, username=args.username, password=args.password)
+    api = Api(server=args.server, username=args.username, password=args.password)
 
     if '.psi-mis.org' not in args.server and '.hnqis.org' not in args.server:
         logger.warn("This script is intended only for *.psi-mis.org or *.hnqis.org")

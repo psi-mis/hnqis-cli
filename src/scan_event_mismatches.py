@@ -3,7 +3,7 @@
 
 import argparse
 
-from dhis2 import Dhis, setup_logger, logger
+from dhis2 import Api, setup_logger, logger
 
 THRESHOLD = 1
 ORDER_FORWARD = 'FEkGksxhOpH'
@@ -56,7 +56,7 @@ def main():
     args = parse_args()
     setup_logger()
 
-    api = Dhis(server=args.server, username=args.username, password=args.password)
+    api = Api(server=args.server, username=args.username, password=args.password)
     p = {
         'paging': False,
         'filter': 'name:like:HNQIS',
