@@ -104,7 +104,7 @@ def main():
         'fields': 'id',
         'paging': False
     }
-    programs_server = [p['id'] for p in api.get('programs', params=params_get)['programs']]
+    programs_server = [p['id'] for p in api.get('programs', params=params_get).json()['programs']]
     for p in programs_csv:
         if p not in programs_server:
             logger.error(u"Program {0} is not a valid program: {1}/programs/{0}.json".format(p, api.api_url))
