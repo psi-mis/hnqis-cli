@@ -87,7 +87,7 @@ def main():
                 'paging': False,
                 'filter': [
                     'name:like:HNQIS - {}'.format(ha),
-                    'name:$like:count',
+                    'name:like$:count',
                     'program.name:!like:v1'  # don't get v1 programIndicators
                 ],
                 'fields': '[id,name]'
@@ -125,7 +125,7 @@ def main():
             p3 = {
                 'paging': False,
                 'filter': [
-                    'shortName:$like: HNQIS {}'.format(ha),  # 2.30 would need to change filters
+                    'shortName:like: HNQIS {}'.format(ha),  # 2.30 would need to change filters
                     'name:!like:v1'
                 ],
                 'fields': 'id,name'
@@ -154,7 +154,7 @@ def main():
 
     print(u"Posting updated programindicators to \033[1m{}\033[0m...".format(args.server))
     time.sleep(3)
-
+    
     api.post('metadata', params={'importMode': 'COMMIT', 'preheatCache': False}, data=indicators)
 
 
